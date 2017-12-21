@@ -18,24 +18,25 @@ play_surface = pygame.display.set_mode((500, 500))
 pygame.display.set_caption("Snake Game")
 
 # Colors
-red = pygame.Color(255, 0, 0) # Game over
-green = pygame.Color(0, 255, 0) # Snake
-brown = pygame.Color(165, 42, 42) # Food
-white = pygame.Color(255, 255, 255) # Background
-black = pygame.Color(0, 0, 0) # Score
+red = pygame.Color(255, 0, 0)  # Game over
+green = pygame.Color(0, 255, 0)  # Snake
+brown = pygame.Color(165, 42, 42)  # Food
+white = pygame.Color(255, 255, 255)  # Background
+black = pygame.Color(0, 0, 0)  # Score
 
-# FPS controller 
+# FPS controller
 fps_controller = pygame.time.Clock()
 
 # Important variables
-snake_pos = [100,50]
-snake_body = [[100,50], [90,50], [80,50]]
+snake_pos = [100, 50]
+snake_body = [[100, 50], [90, 50], [80, 50]]
 
-food_position = [[random.randrange(1,50)*10], [random.randrange(1,50)*10]]
+food_position = [[random.randrange(1, 50) * 10], [random.randrange(1, 50) * 10]]
 food_spawn = True
 
 direction = 'RIGHT'
 change_to = direction
+
 
 # Game over function
 def game_over():
@@ -52,21 +53,51 @@ def game_over():
     pygame.quit()
     sys.exit()
 
+
 # Main logic of the game
 while True:
     for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                # Sair do jogo
-                pygame.quit()
-                sys.exit()
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RIGHT or event.key == ord('d'):
-                    change_to = 'RIGHT'
-                if event.key == pygame.K_LEFT or event.key == ord('a'):
-                    change_to = 'LEFT'
-                if event.key == pygame.K_UP or event.key == ord('w'):
-                    change_to = 'UP'
-                if event.key == pygame.K_DOWN or event.key == ord('s'):
-                    change_to = 'DOWN'
-                if event.key == pygame.K_ESCAPE:
-                    pygame.event.post(pygame.event.Event(pygame.QUIT))
+        if event.type == pygame.QUIT:
+            # Sair do jogo
+            pygame.quit()
+            sys.exit()
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_RIGHT or event.key == ord('d'):
+                change_to = 'RIGHT'
+            if event.key == pygame.K_LEFT or event.key == ord('a'):
+                change_to = 'LEFT'
+            if event.key == pygame.K_UP or event.key == ord('w'):
+                change_to = 'UP'
+            if event.key == pygame.K_DOWN or event.key == ord('s'):
+                change_to = 'DOWN'
+            if event.key == pygame.K_ESCAPE:
+                pygame.event.post(pygame.event.Event(pygame.QUIT))
+
+    # Validation of direction
+    if change_to 'RIGHT' == and not direction == 'LEFT':
+        direction = 'RIGHT'
+    if change_to == 'LEFT' and not direction == 'RIGHT':
+        direction = 'LEFT'
+    if change_to == 'UP' and not direction == 'DOWN':
+        direction = 'UP'
+    if change_to == 'DOWN' and not direction == 'UP':
+        direction = 'DOWN'
+
+    if direction == 'RIGHT':
+        snake_pos[0] += 10
+    if direction == 'LEFT':
+        snake_pos[0] -= 10
+    if direction == 'DOWN':
+        snake_pos[1] += 10
+    if direction == 'UP':
+        snake_pos[1] -= 10     
+        
+    # Snake body mechanism
+    snake_body.insert(0, list(snake_pos))
+    if snake_pos[0] == food_position[0] and snake_pos[1] == food_position[1]:
+        food_spawn = False
+    else 
+        snake_body.pop()
+
+    if food_spawn == False
+        food_position = [[random.randrange(1, 50) * 10], [random.randrange(1, 50) * 10]]
