@@ -1,13 +1,12 @@
 import random
 import sys
 import time
-
 import pygame
 
 check_errors = pygame.init()
 
 # Checagem de erros
-if(check_errors[1] > 0):
+if check_errors[1] > 0:
     print("Erro")
     sys.exit()
 else:
@@ -31,7 +30,7 @@ fps_controller = pygame.time.Clock()
 snake_pos = [100, 50]
 snake_body = [[100, 50], [90, 50], [80, 50]]
 
-food_position = [[random.randrange(1, 50) * 10], [random.randrange(1, 50) * 10]]
+food_position = [random.randrange(1, 50) * 10, random.randrange(1, 50) * 10]
 food_spawn = True
 
 direction = 'RIGHT'
@@ -74,7 +73,7 @@ while True:
                 pygame.event.post(pygame.event.Event(pygame.QUIT))
 
     # Validation of direction
-    if change_to 'RIGHT' == and not direction == 'LEFT':
+    if change_to == 'RIGHT'and not direction == 'LEFT':
         direction = 'RIGHT'
     if change_to == 'LEFT' and not direction == 'RIGHT':
         direction = 'LEFT'
@@ -96,8 +95,26 @@ while True:
     snake_body.insert(0, list(snake_pos))
     if snake_pos[0] == food_position[0] and snake_pos[1] == food_position[1]:
         food_spawn = False
-    else 
+    else: 
         snake_body.pop()
 
-    if food_spawn == False
-        food_position = [[random.randrange(1, 50) * 10], [random.randrange(1, 50) * 10]]
+    if not food_spawn:
+        food_position = [random.randrange(1, 50) * 10, random.randrange(1, 50) * 10]
+
+    food_spawn = True
+
+    play_surface.fill(white)
+
+    # Drawing the snake body
+    for pos in snake_body:
+        pygame.draw.rect(play_surface, green, pygame.Rect(pos[0], pos[1], 10, 10))
+
+    # Drawing the food
+    pygame.draw.rect(play_surface, brown, pygame.Rect(food_position[0], food_position[1], 10, 10))
+
+    # Checking the boudaries
+    if snake_pos[0] >= 500 or snake_pos[0] <= 0 or snake_pos[1] >= 500 or snake_pos[1] <= 0:
+        game_over()
+
+    pygame.display.flip()
+    fps_controller.tick(10)
