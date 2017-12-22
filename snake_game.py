@@ -1,6 +1,7 @@
 import random
 import sys
 import time
+
 import pygame
 
 check_errors = pygame.init()
@@ -73,7 +74,7 @@ while True:
                 pygame.event.post(pygame.event.Event(pygame.QUIT))
 
     # Validation of direction
-    if change_to == 'RIGHT'and not direction == 'LEFT':
+    if change_to == 'RIGHT' and not direction == 'LEFT':
         direction = 'RIGHT'
     if change_to == 'LEFT' and not direction == 'RIGHT':
         direction = 'LEFT'
@@ -89,13 +90,13 @@ while True:
     if direction == 'DOWN':
         snake_pos[1] += 10
     if direction == 'UP':
-        snake_pos[1] -= 10     
-        
-    # Snake body mechanism
+        snake_pos[1] -= 10
+
+        # Snake body mechanism
     snake_body.insert(0, list(snake_pos))
-    if snake_pos[0] == food_position[0] and snake_pos[1] == food_position[1]:
+    if snake_pos == food_position:
         food_spawn = False
-    else: 
+    else:
         snake_body.pop()
 
     if not food_spawn:
@@ -113,7 +114,11 @@ while True:
     pygame.draw.rect(play_surface, brown, pygame.Rect(food_position[0], food_position[1], 10, 10))
 
     # Checking the boudaries
-    if snake_pos[0] >= 500 or snake_pos[0] <= 0 or snake_pos[1] >= 500 or snake_pos[1] <= 0:
+    if snake_pos[0] not in range(0, 500, 10) or snake_pos[1] not in range(0, 500, 10):
+        game_over()
+
+    # Checking if the head hits the tail
+    if snake_pos in snake_body[2:]:
         game_over()
 
     pygame.display.flip()
