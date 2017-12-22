@@ -66,7 +66,7 @@ def show_score(choice=1):
     if choice == 1:
         score_rectangle.midtop = (80, 10)
     else:
-        score_rectangle.midtop = (250, 50)
+        score_rectangle.midtop = (250, 150)
 
     play_surface.blit(score_surface, score_rectangle)
     pygame.display.flip()
@@ -111,7 +111,7 @@ while True:
     if direction == 'UP':
         snake_pos[1] -= 10
 
-        # Snake body mechanism
+    # Snake body mechanism
     snake_body.insert(0, list(snake_pos))
     if snake_pos == food_position:
         food_spawn = False
