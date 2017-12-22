@@ -14,14 +14,17 @@ else:
     print("pygame iniciado com sucesso")
 
 # Play surface
-play_surface = pygame.display.set_mode((500, 500))
+screen_height = 300
+screen_width = screen_height
+
+play_surface = pygame.display.set_mode((screen_height, screen_width))
 pygame.display.set_caption("Snake Game")
 
 # Colors
 red = pygame.Color(255, 0, 0)  # Game over
 green = pygame.Color(0, 255, 0)  # Snake
 brown = pygame.Color(165, 42, 42)  # Food
-white = pygame.Color(255, 255, 255)  # Background
+gray = pygame.Color(240, 240, 240)  # Background
 black = pygame.Color(0, 0, 0)  # Score
 
 # FPS controller
@@ -31,10 +34,15 @@ fps_controller = pygame.time.Clock()
 snake_pos = [100, 50]
 snake_body = [[100, 50], [90, 50], [80, 50]]
 
-food_position = [random.randrange(1, 50) * 10, random.randrange(1, 50) * 10]
+
+def get_random_food_position():
+    return [random.randrange(1, screen_height * 0.1) * 10, random.randrange(1, screen_width * 0.1) * 10]
+
+
+food_position = get_random_food_position()
 food_spawn = True
 
-direction = 'RIGHT'
+direction = 'STOP'
 change_to = direction
 
 score = 0
@@ -45,7 +53,7 @@ def game_over():
     my_font = pygame.font.SysFont('monaco', 72)
     game_over_surface = my_font.render('Game over!', True, red)
     game_over_rectangle = game_over_surface.get_rect()
-    game_over_rectangle.midtop = (250, 50)
+    game_over_rectangle.midtop = (screen_height * 0.5, screen_width * 0.1)
     play_surface.blit(game_over_surface, game_over_rectangle)
 
     show_score(0)
@@ -64,12 +72,12 @@ def show_score(choice=1):
     score_rectangle = score_surface.get_rect()
 
     if choice == 1:
-        score_rectangle.midtop = (80, 10)
+        score_rectangle.midtop = (screen_height * 0.1, screen_width * 0.1)
     else:
-        score_rectangle.midtop = (250, 150)
+        score_rectangle.midtop = (screen_height * 0.5, screen_width * 0.6)
 
     play_surface.blit(score_surface, score_rectangle)
-    pygame.display.flip()
+    pygame. display.flip()
 
 
 # Main logic of the game
@@ -120,11 +128,11 @@ while True:
         snake_body.pop()
 
     if not food_spawn:
-        food_position = [random.randrange(1, 50) * 10, random.randrange(1, 50) * 10]
+        food_position = get_random_food_position()
 
     food_spawn = True
 
-    play_surface.fill(white)
+    play_surface.fill(gray)
 
     # Drawing the snake body
     for pos in snake_body:
@@ -133,12 +141,8 @@ while True:
     # Drawing the food
     pygame.draw.rect(play_surface, brown, pygame.Rect(food_position[0], food_position[1], 10, 10))
 
-    # Checking the boundaries
-    if snake_pos[0] not in range(0, 500, 10) or snake_pos[1] not in range(0, 500, 10):
-        game_over()
-
-    # Checking if the head hits the tail
-    if snake_pos in snake_body[2:]:
+    # Checking if the snake hit the boundaries ou it's tail
+    if snake_pos[0] not in range(0, screen_height, 10) or snake_pos[1] not in range(0, screen_width, 10) or snake_pos in snake_body[2:] and direction != 'STOP':
         game_over()
 
     pygame.display.flip()
