@@ -11,6 +11,7 @@ def get_time_milliseconds():
 
 
 check_errors = pygame.init()
+pygame.mixer.init(frequency=22050, size=-16, channels=2, buffer=4096)
 
 # Checagem de erros
 if check_errors[1] > 0:
@@ -52,6 +53,7 @@ def get_random_food_position():
     while position in snake_body or not game_field_rectangle.collidepoint(position[0], position[1]):
         position = [random.randrange(1, limit_y) * 10, random.randrange(1, limit_x) * 10]
     return position
+
 
 snake_pos = [100, 50]
 snake_body = [[100, 50], [90, 50], [80, 50]]
@@ -123,6 +125,27 @@ def show_food_lasting_time(lasting_time):
     play_surface.blit(time_surface, time_rectangle)
     pygame.display.update(time_rectangle)
 
+
+def play_sound_hit_wall():
+    sound = pygame.mixer.Sound('explosion.aiff')
+    sound.play(0, 0, 0)
+
+
+def play_sound_hit_tail():
+    sound = pygame.mixer.Sound('hit.wav')
+    sound.play(0, 0, 0)
+
+
+def play_sound_food_ate():
+    sound = pygame.mixer.Sound('food.wav')
+    sound.play(0, 0, 0)
+
+
+def play_sound_food_gone():
+    sound = pygame.mixer.Sound('beep.wav')
+    sound.play(0, 0, 0)
+
+
 # Main logic of the game
 while True:
     for event in pygame.event.get():
@@ -174,11 +197,13 @@ while True:
         food_spawn = False
         score += 10  # minimum point
         score += remaining_time_of_food // 100  # points for the time
+        play_sound_food_ate()
     else:
         snake_body.pop()
 
     # Creates a new food if the old one expires
     if remaining_time_of_food <= 0:
+        play_sound_food_gone()
         food_spawn = False
 
     # Creates a new food, if necessary
@@ -202,10 +227,14 @@ while True:
     food_rect = pygame.Rect(food_position[0], food_position[1], 10, 10)
     pygame.draw.rect(play_surface, food_color, food_rect)
 
-    # Checking if the snake hit the boundaries or it's tail (ignores these things if the snake is stopped)
-    if not game_field_rectangle.collidepoint(snake_pos[0], snake_pos[1]) \
-            or snake_pos in snake_body[2:] \
-            and direction != 'STILL':
+    # Checking if the snake hit the boundaries (ignores these things if the snake is stopped)
+    if not game_field_rectangle.collidepoint(snake_pos[0], snake_pos[1]) and direction != 'STILL':
+        play_sound_hit_wall()
+        game_over()
+
+    # Checking if the snake hit it's tail (ignores these things if the snake is stopped)
+    if snake_pos in snake_body[2:] and direction != 'STILL':
+        play_sound_hit_tail()
         game_over()
 
     pygame.display.update()
