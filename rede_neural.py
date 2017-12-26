@@ -26,10 +26,10 @@ saidas = np.array([[0, 0, 0],  # R$ 2
                    [1, 0, 1]])  # R$ 100
 
 with open('rn_sensores.txt', 'r', encoding='utf-8') as rn_sensors:
-    entradas = list(rn_sensors)
+    entradas = np.array(rn_sensors)
 
 with open('rn_outputs.txt', 'r', encoding='utf-8') as rn_saidas:
-    saidas = list(rn_saidas)
+    saidas = np.array(rn_saidas)
 
 # Definição dos pesos de cada camada e, consequentemente, 
 # o número de neurônios em cada camada
@@ -43,10 +43,13 @@ mediaAbsoluta = 1
 
 
 def ativar_rede(valores_entradas):
+    """Ativa a rede e retorna uma lista com as saídas de cada uma das camadas, sendo que a de saída é a primeira
+    :rtype: list
+    """
     somaSinapse0 = np.dot(valores_entradas, pesos0)
     camadaOculta = sigmoid(somaSinapse0)
     somaSinapse1 = np.dot(camadaOculta, pesos1)
-    return sigmoid(somaSinapse1)
+    return [sigmoid(somaSinapse1), camadaOculta]
 
 
 for j in range(epocas):
@@ -54,7 +57,9 @@ for j in range(epocas):
 
     camadaEntrada = entradas
 
-    camadaSaida = ativar_rede(camadaEntrada)
+    respostaDaRede = ativar_rede(camadaEntrada)
+    camadaOculta = respostaDaRede[1]
+    camadaSaida = respostaDaRede[0]
 
     # Atualização de pesos (backpropagation)
 
