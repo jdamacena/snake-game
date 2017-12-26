@@ -57,12 +57,12 @@ def get_random_food_position():
 # Calculates the euclidean distance between two points
 # in a multidimensional space
 def euclidean(p, q):
-    sumSq = 0.0
+    sum_sq = 0.0
     # add up the squared differences  
     for i in range(len(p)):
-        sumSq += (p[i] - q[i]) ** 2
+        sum_sq += (p[i] - q[i]) ** 2
     # take the square root  
-    return sumSq ** 0.5
+    return sum_sq ** 0.5
 
 
 tamanho_blocos = 10
@@ -74,6 +74,7 @@ food_position = get_random_food_position()
 food_spawn = True
 
 direction = 'STILL'
+direction = 'RIGHT'
 direction_number = 0
 change_to = direction
 
@@ -106,12 +107,15 @@ def game_over():
     show_score(0)
     pygame.display.flip()
 
-    s = str(sensor)
-    o = str(output)
+    s = str(sensor_output_data)
 
     print("Dados da partida:\n")
     print(s)
-    print(o)
+
+    # Save the collected data in a file
+    with open('rn_data', 'w', encoding='utf-8') as rn_data:
+        rn_data.write(s)
+
     time.sleep(5)
 
     # Quit the game
@@ -183,21 +187,24 @@ def get_sensor_data(direction_snake):
         front_sensor_position = [snake_pos[0] + tamanho_blocos, snake_pos[1]]
 
     # Verifica se há obstaculos ou comida no sensor
-    if not game_field_rectangle.collidepoint(left_sensor_position[0], left_sensor_position[1]) or left_sensor_position in snake_body[2:]:
+    if not game_field_rectangle.collidepoint(left_sensor_position[0], left_sensor_position[1]) \
+            or left_sensor_position in snake_body[2:]:
         left_sensor_value = 2
     elif left_sensor_position == food_position:
         left_sensor_value = 1
     else:
         left_sensor_value = 0
 
-    if not game_field_rectangle.collidepoint(right_sensor_position[0], right_sensor_position[1]) or right_sensor_position in snake_body[2:]:
+    if not game_field_rectangle.collidepoint(right_sensor_position[0], right_sensor_position[1]) \
+            or right_sensor_position in snake_body[2:]:
         right_sensor_value = 2
     elif right_sensor_position == food_position:
         right_sensor_value = 1
     else:
         right_sensor_value = 0
 
-    if not game_field_rectangle.collidepoint(front_sensor_position[0], front_sensor_position[1]) or front_sensor_position in snake_body[2:]:
+    if not game_field_rectangle.collidepoint(front_sensor_position[0], front_sensor_position[1]) \
+            or front_sensor_position in snake_body[2:]:
         front_sensor_value = 2
     elif front_sensor_position == food_position:
         front_sensor_value = 1
@@ -207,10 +214,9 @@ def get_sensor_data(direction_snake):
     return [left_sensor_value, front_sensor_value, right_sensor_value]
 
 
-# record sensor data and outputs throught the entire game (to use as training data)
-# sensor = [food_distance, left_sensor, front_sensor, right_sensor]
-sensor = []  # List of sensors data
-output = []  # List of actions taken by the player
+# record sensor data and outputs through the entire game (to use as training data)
+# sensor = [food_distance, left_sensor, front_sensor, right_sensor, user_action]
+sensor_output_data = []  # List of sensors data and actions taken by the player
 
 # Main logic of the game
 while True:
@@ -299,8 +305,7 @@ while True:
     pygame.draw.rect(play_surface, food_color, food_rect)
 
     # Taking note of the sensors data and output
-    sensor += [[euclidean(snake_pos, food_position)] + get_sensor_data(direction)]
-    output += [[direction_number]]
+    sensor_output_data += [[euclidean(snake_pos, food_position)] + get_sensor_data(direction) + [direction_number]]
 
     # Checking if the snake hit the boundaries (ignores these things if the snake is stopped)
     if not game_field_rectangle.collidepoint(snake_pos[0], snake_pos[1]) and direction != 'STILL':
