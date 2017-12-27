@@ -1,8 +1,12 @@
+import ast
 import random
 import sys
 import time
 
 import pygame
+
+import rede_neural
+from rede_neural import ativar_rede
 
 
 def get_time_milliseconds():
@@ -79,6 +83,7 @@ direction_number = 0
 change_to = direction
 
 score = 0
+modo_treino = True
 
 
 # Game over function
@@ -112,9 +117,10 @@ def game_over():
     print("Dados da partida:\n")
     print(s)
 
-    # Save the collected data in a file
-    with open('rn_data', 'w', encoding='utf-8') as rn_data:
-        rn_data.write(s)
+    if modo_treino:
+        # Save the collected data in a file
+        with open('rn_data', 'w', encoding='utf-8') as rn_data:
+            rn_data.write(s)
 
     time.sleep(5)
 
@@ -218,6 +224,10 @@ def get_sensor_data(direction_snake):
 # sensor = [food_distance, left_sensor, front_sensor, right_sensor, user_action]
 sensor_output_data = []  # List of sensors data and actions taken by the player
 
+with open('rn_weights', 'r', encoding='utf-8') as rn_weights:
+    for line in rn_weights:
+        rn_weights_array = ast.literal_eval(line)
+
 # Main logic of the game
 while True:
     for event in pygame.event.get():
@@ -236,6 +246,21 @@ while True:
                 change_to = 'DOWN'
             elif event.key == pygame.K_ESCAPE:
                 pygame.event.post(pygame.event.Event(pygame.QUIT))
+
+    # Atuação da rede neural
+    if not modo_treino:
+        valores_entradas = [euclidean(snake_pos, food_position)] + get_sensor_data(direction)
+        rn_saida = rede_neural.ativar_rede(valores_entradas, rn_weights_array)[0]
+
+        if rn_saida[0] > 0.8:
+            change_to = 'RIGHT'
+        elif rn_saida[1] > 0.8:
+            change_to = 'LEFT'
+        elif rn_saida[2] > 0.8:
+            change_to = 'UP'
+        elif rn_saida[3] > 0.8:
+            change_to = 'DOWN'
+        change_to
 
     # Validation of direction
     if change_to == 'RIGHT' and not direction == 'LEFT':
@@ -305,7 +330,8 @@ while True:
     pygame.draw.rect(play_surface, food_color, food_rect)
 
     # Taking note of the sensors data and output
-    sensor_output_data += [[euclidean(snake_pos, food_position)] + get_sensor_data(direction) + [direction_number]]
+    if modo_treino:
+        sensor_output_data += [[euclidean(snake_pos, food_position)] + get_sensor_data(direction) + [direction_number]]
 
     # Checking if the snake hit the boundaries (ignores these things if the snake is stopped)
     if not game_field_rectangle.collidepoint(snake_pos[0], snake_pos[1]) and direction != 'STILL':
