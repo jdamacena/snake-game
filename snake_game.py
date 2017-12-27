@@ -83,7 +83,7 @@ direction_number = 0
 change_to = direction
 
 score = 0
-modo_treino = True
+modo_treino = False
 
 
 # Game over function
